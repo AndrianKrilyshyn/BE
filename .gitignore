@@ -31,3 +31,12 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secrets ###
+aws.txt
+token.txt
+*.credentials
+*.secret
+
+### Claude Code ###
+.claude/

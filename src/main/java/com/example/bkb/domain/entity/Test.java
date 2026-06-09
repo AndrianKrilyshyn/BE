@@ -1,5 +1,6 @@
 package com.example.bkb.domain.entity;
 
+import com.example.bkb.domain.enums.TestStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,8 +30,13 @@ public class Test {
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
-    @Column(nullable = false)
-    private Instant startTime;
+    @Column(nullable = false, unique = true, length = 8)
+    private String accessCode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    @Builder.Default
+    private TestStatus status = TestStatus.ACTIVE;
 
     @Column(nullable = false)
     private Integer durationMinutes;

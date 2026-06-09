@@ -25,9 +25,11 @@ public class Attempt {
     @JoinColumn(name = "test_id", nullable = false)
     private Test test;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "student_id", nullable = false)
-    private User student;
+    @Column(nullable = false)
+    private String candidateEmail;
+
+    @Column(nullable = false)
+    private String candidateName;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

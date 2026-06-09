@@ -1,10 +1,12 @@
 package com.example.bkb.dto;
 
+import java.util.List;
 import java.util.UUID;
 
-public record ProctoringResultMessage(
+public record ReportData(
         UUID attemptId,
         Integer trustScore,
+        Integer recordingDurationSec,
         Integer totalViolations,
-        String reportMetadata
+        List<ReportEvent> events
 ) {}

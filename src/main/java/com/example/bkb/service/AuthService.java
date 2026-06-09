@@ -1,6 +1,7 @@
 package com.example.bkb.service;
 
 import com.example.bkb.domain.entity.User;
+import com.example.bkb.domain.enums.Role;
 import com.example.bkb.dto.AuthResponse;
 import com.example.bkb.dto.LoginRequest;
 import com.example.bkb.dto.RegisterRequest;
@@ -30,7 +31,7 @@ public class AuthService {
                 .email(req.email())
                 .passwordHash(passwordEncoder.encode(req.password()))
                 .fullName(req.fullName())
-                .role(req.role())
+                .role(Role.EXAMINER)
                 .build();
         userRepository.save(user);
         return new AuthResponse(jwtUtils.generateToken(user));

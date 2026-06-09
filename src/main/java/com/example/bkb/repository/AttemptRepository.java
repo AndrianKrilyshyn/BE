@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AttemptRepository extends JpaRepository<Attempt, UUID> {
-    List<Attempt> findByStudentId(UUID studentId);
     List<Attempt> findByTestId(UUID testId);
+    List<Attempt> findByTestAuthorId(UUID authorId);
+    boolean existsByTestId(UUID testId);
 }

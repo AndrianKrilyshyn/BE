@@ -1,9 +1,10 @@
 package com.example.bkb.dto;
 
-import jakarta.validation.constraints.NotNull;
-
-import java.util.UUID;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public record StartAttemptRequest(
-        @NotNull UUID testId
+        @NotBlank String accessCode,
+        @NotBlank @Email String candidateEmail,
+        @NotBlank String candidateName
 ) {}

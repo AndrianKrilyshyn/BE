@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonRawValue;
 import java.time.Instant;
 import java.util.UUID;
 
-public record TemplateResponse(
-        UUID id,
+public record StartAttemptResponse(
+        UUID attemptId,
+        UUID testId,
         String title,
+        Integer durationMinutes,
         @JsonRawValue String contentSchema,
-        Instant createdAt
+        Instant startedAt
 ) {}

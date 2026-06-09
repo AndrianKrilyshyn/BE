@@ -1,8 +1,6 @@
 package com.example.bkb.dto;
 
-
-import com.fasterxml.jackson.annotation.JsonRawValue;
-
+import java.util.List;
 import java.util.UUID;
 
 public record ReportResponse(
@@ -10,5 +8,6 @@ public record ReportResponse(
         UUID attemptId,
         Integer trustScore,
         Integer totalViolations,
-        @JsonRawValue String reportMetadata
+        Integer recordingDurationSec,
+        List<EventResponse> events
 ) {}

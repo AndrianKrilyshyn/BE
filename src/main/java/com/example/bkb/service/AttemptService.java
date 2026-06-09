@@ -2,14 +2,15 @@ package com.example.bkb.service;
 
 import com.example.bkb.domain.entity.Attempt;
 import com.example.bkb.domain.enums.AttemptStatus;
+import com.example.bkb.domain.enums.TestStatus;
 import com.example.bkb.dto.AttemptResponse;
+import com.example.bkb.dto.StartAttemptRequest;
+import com.example.bkb.dto.StartAttemptResponse;
 import com.example.bkb.exception.ApiException;
-import com.example.bkb.exception.ForbiddenException;
 import com.example.bkb.exception.NotFoundException;
 import com.example.bkb.messaging.ProctoringTaskPublisher;
 import com.example.bkb.repository.AttemptRepository;
 import com.example.bkb.repository.TestRepository;
-import com.example.bkb.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,35 +26,42 @@ public class AttemptService {
 
     private final AttemptRepository attemptRepository;
     private final TestRepository testRepository;
-    private final UserRepository userRepository;
     private final S3PresignedUrlService s3Service;
     private final ProctoringTaskPublisher taskPublisher;
 
     @Transactional
-    public AttemptResponse start(UUID testId, UUID studentId) {
-        var test = testRepository.findById(testId)
-                .orElseThrow(() -> new NotFoundException("Test not found"));
-        var student = userRepository.findById(studentId)
-                .orElseThrow(() -> new NotFoundException("Student not found"));
+    public StartAttemptResponse start(StartAttemptRequest req) {
+        var test = testRepository.findByAccessCode(req.accessCode().toUpperCase())
+                .orElseThrow(() -> new NotFoundException("Test not found for code: " + req.accessCode()));
+
+        if (test.getStatus() != TestStatus.ACTIVE) {
+            throw new ApiException(HttpStatus.CONFLICT, "Test is not active");
+        }
 
         var attempt = Attempt.builder()
                 .test(test)
-                .student(student)
+                .candidateEmail(req.candidateEmail())
+                .candidateName(req.candidateName())
                 .status(AttemptStatus.IN_PROGRESS)
                 .startedAt(Instant.now())
                 .build();
         attemptRepository.save(attempt);
-        return toResponse(attempt);
+
+        return new StartAttemptResponse(
+                attempt.getId(),
+                test.getId(),
+                test.getTitle(),
+                test.getDurationMinutes(),
+                test.getTemplate().getContentSchema(),
+                attempt.getStartedAt()
+        );
     }
 
     @Transactional
-    public AttemptResponse finish(UUID attemptId, UUID studentId, String answersJson) {
+    public AttemptResponse finish(UUID attemptId, String answersJson) {
         var attempt = attemptRepository.findById(attemptId)
                 .orElseThrow(() -> new NotFoundException("Attempt not found"));
 
-        if (!attempt.getStudent().getId().equals(studentId)) {
-            throw new ForbiddenException("Not your attempt");
-        }
         if (attempt.getStatus() == AttemptStatus.COMPLETED) {
             throw new ApiException(HttpStatus.CONFLICT, "Attempt already completed");
         }
